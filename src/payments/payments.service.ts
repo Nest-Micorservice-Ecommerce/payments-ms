@@ -13,7 +13,7 @@ export class PaymentsService {
 
     const { currency, items, orderId } = paymentSessionDto;
 
-    const lineItems = items.map(item => {
+    const lineItems = items!.map(item => {
       return {
         price_data: {
           currency,
@@ -39,7 +39,12 @@ export class PaymentsService {
       cancel_url: envs.stripeCancelUrl,
     });
 
-    return session;
+    // return session;    esta linea retorna toda la sesion la cual tiene mucha info innecesaria
+    return {
+      cancelUrl: session.cancel_url,
+      successUrl: session.success_url,
+      url: session.url,
+    }
   }
 
   async stripeWebhook(request: Request, res: Response) {

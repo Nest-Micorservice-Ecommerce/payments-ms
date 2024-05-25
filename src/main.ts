@@ -24,8 +24,13 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: envs.natsSrevers,
-    }
+    },
+  },{
+    //esta linea de codigo se agrega para aplicaciones hibridas y pueda comprati r guards dto y demas
+    inheritAppConfig: true
   })
+
+
 
   await app.startAllMicroservices();
 
