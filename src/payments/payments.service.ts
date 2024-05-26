@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { envs } from 'src/config';
 import Stripe from 'stripe';
 import { PaymentSessionDto } from './dto/payment-session.dto';
 import { Request, Response } from 'express';
+import { receiveMessageOnPort } from 'worker_threads';
 
 @Injectable()
 export class PaymentsService {
 
   private readonly stripe = new Stripe(envs.stripeSecret)
+  private readonly logger = new Logger('PaymentsService');
 
   async createPaymentSession(paymentSessionDto: PaymentSessionDto) {
 
@@ -64,11 +66,12 @@ export class PaymentsService {
     switch (event.type) {
       case 'charge.succeeded':
         const chargeSucceeded = event.data.object
-        //TODO: Llamar microservicio
-        console.log({
-          metadata: chargeSucceeded.metadata,
+        const payload = {
+          stripePaymentId: chargeSucceeded.id,
           orderId: chargeSucceeded.metadata.orderId,
-        });
+          receipUrl: chargeSucceeded.receipt_url
+        }
+        this.logger.log({payload})
         break;
 
       default:
